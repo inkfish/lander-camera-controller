@@ -1,7 +1,7 @@
 From 63250bdc4a374dc0320559be94019131481ffaef Mon Sep 17 00:00:00 2001
 From: Ryan Govostes <ryan@ink.fish>
 Date: Mon, 15 May 2023 05:57:58 +0000
-Subject: [PATCH] camera: Support framerates on MindVision camera
+Subject: [PATCH 1/2] camera: Support framerates on MindVision camera
 
 ---
  src/arvcamera.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++--

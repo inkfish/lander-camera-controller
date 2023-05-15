@@ -1,0 +1,25 @@
+From ab89c09573716dcfc4a6808cf3aeb1e90e765e87 Mon Sep 17 00:00:00 2001
+From: Ryan Govostes <ryan@ink.fish>
+Date: Mon, 15 May 2023 06:49:47 +0000
+Subject: [PATCH 2/2] gst: Increase timeout value
+
+---
+ gst/gstaravis.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/gst/gstaravis.c b/gst/gstaravis.c
+index 01818c3e..097c802b 100644
+--- a/gst/gstaravis.c
++++ b/gst/gstaravis.c
+@@ -42,7 +42,7 @@
+ #define _(x) (x)
+ 
+ #define GST_ARAVIS_DEFAULT_N_BUFFERS		50
+-#define GST_ARAVIS_BUFFER_TIMEOUT_DEFAULT	2000000
++#define GST_ARAVIS_BUFFER_TIMEOUT_DEFAULT	20000000  /* microseconds */
+ 
+ GST_DEBUG_CATEGORY_STATIC (aravis_debug);
+ #define GST_CAT_DEFAULT aravis_debug
+-- 
+2.34.1
+
