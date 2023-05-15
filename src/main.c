@@ -32,7 +32,7 @@ static GstElement *create_pipeline()
     GstElement *filter = gst_element_factory_make("capsfilter", "filter");
     GstElement *bayer2rgb = gst_element_factory_make("bayer2rgb", "bayer2rgb");
     GstElement *convert = gst_element_factory_make("videoconvert", "convert");
-    GstElement *encoder = gst_element_factory_make("x264enc" /*"avenc_ffv1"*/, "encoder");
+    GstElement *encoder = gst_element_factory_make("avenc_ffv1", "encoder");
     GstElement *muxer = gst_element_factory_make("matroskamux", "muxer");
     GstElement *sink = gst_element_factory_make("splitmuxsink", "sink");
 
