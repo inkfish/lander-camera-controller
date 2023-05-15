@@ -57,13 +57,15 @@ static GstElement *create_pipeline()
     g_object_set(filter, "caps", caps, NULL);
     gst_caps_unref(caps);
 
+    // Configure the output file name and splitting options
+    // TODO: Make this user-configurable
     char *timestamp = get_iso8601_timestamp();
     char *location = g_strdup_printf("video_%s_%%05d.mkv", timestamp);
     g_object_set(
         sink,
         "location", location,
         // TODO: Make max file size time configurable
-        "max-size-time",(gint64)60000000000,  // 1 hour in nanoseconds
+        "max-size-time",(gint64)3600000000000LL,  // 1 hour in nanoseconds
         "muxer", muxer,
         NULL
     );
