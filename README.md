@@ -22,7 +22,7 @@ The controller software uses the [GStreamer][] multimedia framework to implement
 
 Communication with the camera is done using [Aravis](https://github.com/AravisProject/aravis), rather than proprietary, vendor-specific libraries.
 
-An [intervalometer][] is implemented based on the computer's wall clock time—i.e., if the interval is set to 20 seconds, the trigger will fire at :00, :20, :40. In testing on a Raspberry Pi 4, the timing is usually accurate to 0.002 seconds. The trigger is sent to the camera as a GenICam command, rather than an electrical pulse.
+An [intervalometer][] is implemented based on the computer's wall clock time—i.e., if the interval is set to 20 seconds, the trigger will fire at :00, :20, :40. In testing on a Raspberry Pi 4, the timing is usually accurate to 0.01 seconds. The trigger is sent to the camera as a GenICam command, rather than an electrical pulse.
 
   [intervalometer]: https://en.wikipedia.org/wiki/Intervalometer
 
