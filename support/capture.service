@@ -1,0 +1,10 @@
+[Unit]
+Description=Capture service
+After=time-sync.target
+
+[Service]
+ExecStart=/usr/local/bin/capture
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
