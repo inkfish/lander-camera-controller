@@ -59,6 +59,13 @@ Any settings that need to be adjusted on the camera should be done through Aravi
     arv-tool control Gain=4
 
 
+## Time Coding
+
+Currently, the precise time of each trigger is not recorded in the output file. This is a high priority feature but there were obstacles, such as an [GStreamer issue][gst-timecode-issue] related to timecodes and fractional framerates.
+
+  [gst-timecode-issue]: https://gitlab.freedesktop.org/gstreamer/gstreamer/-/issues/2465
+
+
 ## Time Synchronization
 
 GPS can be used to precisely synchronize the clocks across independently-running camera controllers. Because the intervalometer is based on the wall clock time, this should result in the cameras triggering at approximately the same instant. (This technique is inspired by the [Straightedge][] art installation, which uses GPS to synchronize lights over a 2.6 mile span.)
