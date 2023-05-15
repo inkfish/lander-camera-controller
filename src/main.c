@@ -137,11 +137,12 @@ static gboolean grab_frame_cb(gpointer user_data) {
 }
 
 
-static gboolean stop_timeout_cb(gpointer user_data) {
-    g_print ("Timeout reached, stopping main loop...\n");
+static gboolean on_unix_signal(gpointer user_data)
+{
+    g_print("Signal received, stopping main loop...\n");
     GMainLoop *loop = (GMainLoop *)user_data;
     g_main_loop_quit(loop);
-    return FALSE;  // removes the source
+    return TRUE;
 }
 
 
@@ -165,6 +166,10 @@ int main(int argc, char *argv[])
     // Create the main loop
     GMainLoop *loop = g_main_loop_new(NULL, FALSE);
 
+    // Register UNIX signal handlers
+    g_unix_signal_add(SIGINT, G_SOURCE_FUNC(on_unix_signal), loop);
+    g_unix_signal_add(SIGTERM, G_SOURCE_FUNC(on_unix_signal), loop);
+
     // Create the intervalometer
     WallClockIntervalometerSource* intervalometer =
         (WallClockIntervalometerSource*)g_source_new(
@@ -186,9 +191,6 @@ int main(int argc, char *argv[])
     g_source_attach((GSource*)intervalometer, g_main_loop_get_context(loop));
     intervalometer_start(intervalometer);
     g_source_unref((GSource*)intervalometer);
-
-    // Add a timeout to stop the recording
-    g_timeout_add_seconds(120, (GSourceFunc)stop_timeout_cb, loop);
 
     // Start playing the pipeline and run the main loop
     gst_element_set_state(pipeline, GST_STATE_PLAYING);
