@@ -50,9 +50,8 @@ static GstElement *create_pipeline()
     // TODO: Make framerate based on configured interval.
     GstCaps *caps = gst_caps_from_string(
         "video/x-bayer,"
-        "format=grbg,"
-        "width=2592,height=1944,"
-        "framerate=1/10"
+        "format=rggb,"
+        "width=2448,height=2048"
     );
     g_object_set(filter, "caps", caps, NULL);
     gst_caps_unref(caps);
