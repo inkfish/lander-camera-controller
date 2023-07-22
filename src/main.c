@@ -12,6 +12,11 @@
 #include "WallClockIntervalometerSource.h"
 
 
+#define INTERVAL 10  /* seconds */
+
+#define STRINGIFY(x) #x
+#define FRAMERATE_STR(interval) "1/" STRINGIFY(interval)
+
 static char *get_iso8601_timestamp(void) {
     time_t rawtime;
     time(&rawtime);
@@ -27,7 +32,7 @@ static char *get_iso8601_timestamp(void) {
 static GstElement *create_pipeline()
 {
     GstElement *pipeline = gst_pipeline_new("pipeline");
-    
+
     GstElement *source = gst_element_factory_make("aravissrc", "source");
     GstElement *filter = gst_element_factory_make("capsfilter", "filter");
     GstElement *bayer2rgb = gst_element_factory_make("bayer2rgb", "bayer2rgb");
@@ -45,13 +50,11 @@ static GstElement *create_pipeline()
 
     // Set caps on the filter element so that we interpret the stream's raw data
     // correctly.
-    //
-    // TODO: These settings are specific to the MindVision camera.
-    // TODO: Make framerate based on configured interval.
     GstCaps *caps = gst_caps_from_string(
         "video/x-bayer,"
         "format=rggb,"
-        "width=2448,height=2048"
+        "width=2448,height=2048,"
+        "framerate=" FRAMERATE_STR(INTERVAL)
     );
     g_object_set(filter, "caps", caps, NULL);
     gst_caps_unref(caps);
@@ -86,7 +89,7 @@ static GstElement *create_pipeline()
 static ArvCamera *get_camera_from_pipeline(GstElement *pipeline)
 {
     ArvCamera *camera = NULL;
-    
+
     // Get the "camera" prop of the "source" element in the pipeline
     GstElement *source = gst_bin_get_by_name(GST_BIN(pipeline), "source");
     g_object_get(G_OBJECT(source), "camera", &camera, NULL);
@@ -94,7 +97,7 @@ static ArvCamera *get_camera_from_pipeline(GstElement *pipeline)
 
     if (!ARV_IS_CAMERA(camera)) {
         g_printerr("Could not get Aravis camera object from pipeline\n");
-        return NULL;
+        exit(1);
     }
 
     g_object_ref(camera);
@@ -104,11 +107,21 @@ static ArvCamera *get_camera_from_pipeline(GstElement *pipeline)
 
 static void configure_camera(ArvCamera *camera)
 {
+    GError *error = NULL;
+
     // The camera must be in continuous capture mode for triggers to work
-    arv_camera_set_acquisition_mode(camera, ARV_ACQUISITION_MODE_CONTINUOUS, NULL);
+    arv_camera_set_acquisition_mode(camera, ARV_ACQUISITION_MODE_CONTINUOUS, &error);
+    if (error) {
+        g_printerr("Failed to set acquisition mode: %s\n", error->message);
+        exit(1);
+    }
 
     // This not only configures the TriggerSource, but also enables TriggerMode
-    arv_camera_set_trigger(camera, "Software", NULL);
+    arv_camera_set_trigger(camera, "Software", &error);
+    if (error) {
+        g_printerr("Failed to set trigger: %s\n", error->message);
+        exit(1);
+    }
 
 #if 0
     // For testing, in case we want to disable the trigger
@@ -179,7 +192,7 @@ int main(int argc, char *argv[])
         );
 
     // TODO: Make interval configurable
-    intervalometer->interval = 10 * G_TIME_SPAN_SECOND;
+    intervalometer->interval = INTERVAL * G_TIME_SPAN_SECOND;
 
     g_object_ref(camera);
     g_source_set_callback(
@@ -188,7 +201,7 @@ int main(int argc, char *argv[])
         camera,  // user data
         g_object_unref  // destroy notify callback
     );
-    
+
     g_source_attach((GSource*)intervalometer, g_main_loop_get_context(loop));
     intervalometer_start(intervalometer);
     g_source_unref((GSource*)intervalometer);
@@ -205,7 +218,7 @@ int main(int argc, char *argv[])
     // (e.g., the muxer) to gracefully finish.
     //
     // We then wait synchronously for the bus to report that the end-of-stream
-    // message (success) or an error. 
+    // message (success) or an error.
     gst_element_send_event(pipeline, gst_event_new_eos());
     GstMessage *bus_msg = gst_bus_timed_pop_filtered(
         GST_ELEMENT_BUS(pipeline),
