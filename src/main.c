@@ -12,6 +12,7 @@
 #include "WallClockIntervalometerSource.h"
 
 
+#define CAMERA_NAME "Lucid Vision Labs-PHX051S-C-222701823"
 #define INTERVAL 10  /* seconds */
 
 #define STRINGIFY(x) #x
@@ -47,6 +48,13 @@ static GstElement *create_pipeline()
             gst_object_unref(pipeline);
         return NULL;
     }
+
+    // Set the camera we are looking for
+    g_object_set(
+        source,
+        "camera-name", CAMERA_NAME,
+        NULL
+    );
 
     // Set caps on the filter element so that we interpret the stream's raw data
     // correctly.
