@@ -2,15 +2,21 @@
 
 This project implements a controller for a stills camera deployed on the Inkfish landers. The objective is to capture an image at a specific interval.
 
-Currently, the project has been tested with a [MindVision GE502C][] [GigE Vision][] industrial camera as a proxy for the camera to be installed on the lander system.
+Currently, the project has been tested with a [Lucid Vision Labs PHX051S-C][] [GigE Vision][] industrial camera.
 
-  [MindVision GE502C]: https://www.mindvision.com.cn/index_en.aspx
+  [Lucid Vision Labs PHX051S-C]: https://thinklucid.com/product/phoenix-5-0-mp-imx568/
   [GigE Vision]: https://en.wikipedia.org/wiki/GigE_Vision
 
 
 ## Build and Usage
 
+It is recommended that you install Aravis 0.8.27 or newer, building from source if necessary. Ubuntu 22.04 provides an outdated version which is unstable.
+
     make
+    ./capture
+
+If the `aravissrc` GStreamer plugin is installed in a non-standard path, specifiy it with, e.g.:
+
     ./capture --gst-plugin-path=/usr/local/lib/aarch64-linux-gnu/gstreamer-1.0
 
 
@@ -58,6 +64,10 @@ Any settings that need to be adjusted on the camera should be done through Aravi
 
     arv-tool control Gain=4
 
+It is strongly recommended to set `GevGVCPPendingAck=true` because the PHX051S-C can take too long to acknowledge requests, leading to timeouts.
+
+    arv-tool-0.8 control GevGVCPPendingAck=true
+
 
 ## Time Coding
 
@@ -85,12 +95,15 @@ Configuring a GPS-disciplined system clock can be thorny, especially with pulse-
 
 ## Strobes
 
-Strobes have not yet been integrated. The camera provides a strobe output pin and delay settings that can be configrued.
+Strobes have not yet been integrated. The camera provides a strobe output pin and delay settings that can be configured.
 
 
 ## Considerations for MindVision Camera
 
-The MindVision camera provides a similar interface to the eventual camera we hope to deploy on the landers, but is a low-cost unit that will inevitably differ from the final camera.
+The [MindVision GE502C][] camera provides a similar GigE Vision interface to the eventual camera we hope to deploy on the landers, but is a low-cost unit that will inevitably differ from the final camera.
+
+  [MindVision GE502C]: https://www.mindvision.com.cn/index_en.aspx
+
 
 A patch to Aravis is provided in the `support/aravis/` directory to work around an issue with the camera failing to describe supported framerates. The issue is discussed in [this forum thread][mindvision-thread].
 
